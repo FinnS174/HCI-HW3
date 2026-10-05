@@ -9,38 +9,30 @@ page_body = ui.column()
 
 def api_get(path):
     try:
-        # Attempt to send GET request to API
         response = requests.get(f"{API_URL}{path}", timeout=5)
 
-        # If we get an error code back, raise an exception
         response.raise_for_status()
 
-        # Otherwise, GET was successful so return response data
         return response.json()
 
     except requests.RequestException as e:
-        # GET request was unsuccessful
         ui.notify(f"Could not reach API: {e}", type="negative")
         return []
 
 
 def api_post(path, data):
     try:
-        # Attempt to send POST request to API with data payload
         response = requests.post(
             f"{API_URL}{path}",
             json=data,
             timeout=5
         )
 
-        # If we get an error code back, raise an exception
         response.raise_for_status()
 
-        # Otherwise, POST was successful
         return True
 
     except requests.RequestException as e:
-        # POST request was unsuccessful
         ui.notify(f"Could not reach API: {e}", type="negative")
         return False
 
@@ -113,20 +105,17 @@ def edit_question(question):
 
 
 def render_question(question):
-    # Common region for an individual question
     with ui.card().classes(
         "w-full p-5 mb-4 rounded-xl "
         "shadow-sm border border-gray-200 "
         "bg-white hover:shadow-md transition-shadow"
     ) as card:
 
-        # Clicking the card still reveals/hides the answer
         card.on(
             "click",
             lambda q=question: toggle_answer(q["id"])
         )
 
-        # Question and eye icon
         with ui.row().classes(
             "w-full items-center justify-between"
         ):
@@ -135,15 +124,12 @@ def render_question(question):
                 "text-lg font-semibold text-gray-900"
             )
 
-            # Eye icon acts as a visual signifier that the question
-            # can be clicked to reveal its answer.
             ui.icon(
                 "visibility"
             ).classes(
                 "text-gray-500 text-2xl"
             )
 
-        # Answer
         ui.label(question["a"]).classes(
             "text-base text-gray-700 "
             "bg-gray-50 rounded-lg p-4 mt-3"
@@ -152,7 +138,6 @@ def render_question(question):
             "show_answer"
         )
 
-        # Edit and Delete grouped horizontally
         with ui.row().classes(
             "w-full justify-end gap-2 mt-4"
         ):
@@ -174,8 +159,11 @@ def render_question(question):
             )
 
 
-def toggle_answer(i):
-    questions[i]["state"]["show_answer"] = not questions[i]["state"]["show_answer"]
+def toggle_answer(id):
+    for question in questions:
+        if question["id"] == id:
+            question["state"]["show_answer"] = not question["state"]["show_answer"]
+            return
 
 
 def add_new_question(question, answer):
@@ -203,7 +191,6 @@ def delete_question(id):
 
 def render_text_inputs():
 
-    # Stronger common region for the add-question functionality
     with ui.card().classes(
         "w-full p-6 mt-8 mb-6 rounded-xl "
         "shadow-md border-2 border-blue-200 "
@@ -264,12 +251,10 @@ def render_page():
         "w-full min-h-screen bg-gray-100"
     ):
 
-        # Main page container
         with ui.column().classes(
             "w-full max-w-4xl mx-auto p-6"
         ):
 
-            # Page title creates visual hierarchy
             ui.label(
                 "HCI Review Questions"
             ).classes(
@@ -282,7 +267,6 @@ def render_page():
                 "text-base text-gray-600 mb-6"
             )
 
-            # Question cards
             for question in questions:
                 question["state"] = {
                     "show_answer": False
@@ -290,7 +274,6 @@ def render_page():
 
                 render_question(question)
 
-            # Add-question common region
             render_text_inputs()
 
 
