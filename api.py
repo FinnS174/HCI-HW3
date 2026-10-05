@@ -49,12 +49,23 @@ def add_question(req: QuestionRequest):
 # TODO: Add a new route that can be used to delete a question/answer from the dataset.
 @app.delete("/delete/{id}")
 def delete_question(id: int):
-    pass
+    for question in questions:
+        if question["id"] == id:
+            questions.remove(question)
+            return {"message": "Question deleted successfully"}
+            
+    raise HTTPException(status_code=404, detail=f"Question with ID {id} not found")
 
 # TODO: Add a new route that can be used to update a question/answer within the dataset.
 @app.put("/update/{id}")
 def update_question(id: int, req: QuestionRequest):
-    pass
+    for question in questions:
+        if question["id"] == id:
+            question["q"] = req.question
+            question["a"] = req.answer
+            return question
+
+    raise HTTPException(status_code=404, detail="Question not found")
 
 if __name__=="__main__":
     uvicorn.run(app, port=8005)
